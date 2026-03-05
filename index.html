@@ -1,297 +1,490 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard IT – Parque Tempisque</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet"/>
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: sans-serif; background: #e8f5ee; }
-  </style>
+  <style>*{box-sizing:border-box}body{margin:0;font-family:sans-serif;background:#e8f5ee}</style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    const { useState, useMemo, useEffect } = React;
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useEffect } = React;
 
-    const TEAM = ["Abel", "Mauricio", "Alvaro", "Emerson"];
-    const PRIORITIES = ["Alta", "Media", "Baja"];
-    const STATUSES = ["Pendiente", "En progreso", "Listo"];
-    const CATEGORIES = ["Soporte", "Infraestructura", "Desarrollo", "Seguridad", "Redes", "Administración", "Otro"];
-    const GREEN = "#1a5c2e", GREEN_DARK = "#134522", GREEN_LIGHT = "#e8f5ee", GREEN_MID = "#2d7a45";
-    const AVATAR_COLORS = ["#1a5c2e","#2563eb","#7c3aed","#b45309","#0e7490"];
-    const STORAGE_KEY = "it-dashboard-pt-v1";
-    const today = new Date().toISOString().split("T")[0];
+const TEAM = ["Abel", "Mauricio", "Alvaro", "Emerson"];
+const PRIORITIES = ["Alta", "Media", "Baja"];
+const STATUSES = ["Pendiente", "En progreso", "Listo"];
+const CATEGORIES = ["Soporte", "Infraestructura", "Desarrollo", "Seguridad", "Redes", "Administración", "Otro"];
+const GREEN = "#1a5c2e", GREEN_DARK = "#134522", GREEN_LIGHT = "#e8f5ee", GREEN_MID = "#2d7a45";
+const AVATAR_COLORS = ["#1a5c2e","#2563eb","#7c3aed","#b45309","#0e7490"];
+const STORAGE_KEY = "it-dashboard-pt-v11";
+const today = new Date().toISOString().split("T")[0];
 
-    const STATUS_STYLE = { "Pendiente":"bg-gray-100 text-gray-600 border border-gray-300","En progreso":"bg-blue-100 text-blue-700 border border-blue-300","Listo":"bg-green-100 text-green-700 border border-green-300" };
-    const PRIORITY_STYLE = { "Alta":"bg-red-100 text-red-700 border border-red-300","Media":"bg-yellow-100 text-yellow-700 border border-yellow-300","Baja":"bg-gray-100 text-gray-500 border border-gray-300" };
-    const CATEGORY_STYLE = { "Soporte":"bg-purple-100 text-purple-700 border border-purple-300","Infraestructura":"bg-orange-100 text-orange-700 border border-orange-300","Desarrollo":"bg-cyan-100 text-cyan-700 border border-cyan-300","Seguridad":"bg-red-100 text-red-700 border border-red-300","Redes":"bg-indigo-100 text-indigo-700 border border-indigo-300","Administración":"bg-teal-100 text-teal-700 border border-teal-300","Otro":"bg-gray-100 text-gray-500 border border-gray-300" };
+const STATUS_STYLE = {"Pendiente":"bg-gray-100 text-gray-600 border border-gray-300","En progreso":"bg-blue-100 text-blue-700 border border-blue-300","Listo":"bg-green-100 text-green-700 border border-green-400"};
+const PRIORITY_STYLE = {"Alta":"bg-red-100 text-red-700 border border-red-300","Media":"bg-yellow-100 text-yellow-700 border border-yellow-300","Baja":"bg-gray-100 text-gray-500 border border-gray-300"};
+const CATEGORY_STYLE = {"Soporte":"bg-purple-100 text-purple-700 border border-purple-300","Infraestructura":"bg-orange-100 text-orange-700 border border-orange-300","Desarrollo":"bg-cyan-100 text-cyan-700 border border-cyan-300","Seguridad":"bg-red-100 text-red-700 border border-red-300","Redes":"bg-indigo-100 text-indigo-700 border border-indigo-300","Administración":"bg-teal-100 text-teal-700 border border-teal-300","Otro":"bg-gray-100 text-gray-500 border border-gray-300"};
 
-    const INIT = [
-      { id:1, name:"Migración servidor", assignees:["Mauricio","Abel"], priority:"Alta", status:"En progreso", deadline:"2026-03-15", category:"Infraestructura", notes:"Revisar backups", progress:45, links:[], comments:[], subtasks:[{id:11,text:"Backup completo",done:true},{id:12,text:"Migrar datos",done:false}] },
-      { id:2, name:"Actualización ERP",  assignees:["Alvaro"], priority:"Media", status:"Pendiente", deadline:"2026-03-28", category:"Desarrollo", notes:"", progress:0, links:[], comments:[], subtasks:[] },
-      { id:3, name:"Soporte equipos",    assignees:["Emerson"], priority:"Baja", status:"Listo", deadline:"2026-03-05", category:"Soporte", notes:"Completado", progress:100, links:[], comments:[], subtasks:[] },
-      { id:4, name:"Revisión seguridad", assignees:["Abel","Mauricio","Alvaro","Emerson"], priority:"Alta", status:"Pendiente", deadline:"2026-03-20", category:"Seguridad", notes:"Proyecto comunitario", progress:10, links:[], comments:[], subtasks:[] },
-    ];
-    const EMPTY = { name:"", assignees:["Abel"], priority:"Media", status:"Pendiente", deadline:today, category:"Soporte", notes:"", progress:0, links:[], comments:[], subtasks:[] };
+const INIT = [
+  {id:1,name:"Migración servidor",assignees:["Mauricio","Abel"],priority:"Alta",status:"En progreso",deadline:"2026-03-15",category:"Infraestructura",notes:"Revisar backups antes de migrar",progress:45,links:[],comments:[],subtasks:[{id:11,text:"Backup completo",done:true},{id:12,text:"Migrar datos",done:false}]},
+  {id:2,name:"Actualización ERP",assignees:["Alvaro"],priority:"Media",status:"Pendiente",deadline:"2026-03-28",category:"Desarrollo",notes:"",progress:0,links:[],comments:[],subtasks:[]},
+  {id:3,name:"Soporte equipos oficina",assignees:["Emerson"],priority:"Baja",status:"Listo",deadline:"2026-03-05",category:"Soporte",notes:"Completado sin incidencias",progress:100,links:[],comments:[{id:31,author:"Emerson",text:"Todo listo, sin problemas.",date:"2026-03-05"}],subtasks:[]},
+  {id:4,name:"Revisión de seguridad red",assignees:["Abel","Mauricio","Alvaro","Emerson"],priority:"Alta",status:"Pendiente",deadline:"2026-03-20",category:"Seguridad",notes:"Proyecto comunitario",progress:10,links:[],comments:[],subtasks:[{id:41,text:"Escaneo de puertos",done:false},{id:42,text:"Auditoría de usuarios",done:false}]},
+];
+const EMPTY = {name:"",assignees:["Abel"],priority:"Media",status:"Pendiente",deadline:today,category:"Soporte",notes:"",progress:0,links:[],comments:[],subtasks:[]};
 
-    function isOverdue(d,s){ return s!=="Listo" && d < today; }
-    function daysUntil(d){ return Math.ceil((new Date(d)-new Date(today))/(1000*60*60*24)); }
+function isOverdue(d,s){return s!=="Listo"&&d<today;}
+function daysUntil(d){return Math.ceil((new Date(d)-new Date(today))/(1000*60*60*24));}
 
-    function Badge({label,style}){ return <span className={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${style}`}>{label}</span>; }
-    function Avatar({name,size=22}){
-      const idx=TEAM.indexOf(name)%AVATAR_COLORS.length;
-      return <div title={name} style={{width:size,height:size,borderRadius:"50%",background:AVATAR_COLORS[idx],border:"2px solid white",display:"flex",alignItems:"center",justifyContent:"center",fontSize:size*0.42,color:"white",fontWeight:700,flexShrink:0}}>{name[0]}</div>;
-    }
-    function AvatarGroup({assignees}){
-      if(assignees.length===TEAM.length) return <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{background:GREEN_LIGHT,color:GREEN_DARK,border:`1px solid #a8d5b5`}}>🌿 Todos</span>;
-      return <div style={{display:"flex",alignItems:"center",gap:2}}>{assignees.map((a,i)=><div key={a} style={{marginLeft:i===0?0:-6}}><Avatar name={a}/></div>)}<span className="ml-1 text-xs text-gray-500">{assignees.join(", ")}</span></div>;
-    }
-    function Logo({size=48}){
-      return (
-        <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="48" stroke="white" strokeWidth="5" fill="none"/>
-          <path d="M28 68 Q24 58 28 52 Q32 47 36 50 L44 58" stroke="white" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-          <path d="M72 68 Q76 58 72 52 Q68 47 64 50 L56 58" stroke="white" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-          <path d="M36 50 Q40 44 50 62 Q60 44 64 50" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round"/>
-          <path d="M50 20 Q62 28 64 42 Q62 54 50 58 Q38 54 36 42 Q38 28 50 20Z" fill="white" opacity="0.9"/>
-          <text x="50" y="36" textAnchor="middle" fontSize="5.5" fill={GREEN} fontFamily="monospace" fontWeight="bold">1010</text>
-          <text x="50" y="43" textAnchor="middle" fontSize="5.5" fill={GREEN} fontFamily="monospace" fontWeight="bold">0111</text>
-          <text x="50" y="50" textAnchor="middle" fontSize="5.5" fill={GREEN} fontFamily="monospace" fontWeight="bold">1001</text>
-        </svg>
-      );
-    }
+function Badge({label,style}){return <span className={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap ${style}`}>{label}</span>;}
+function Avatar({name,size=22}){
+  const idx=TEAM.indexOf(name)%AVATAR_COLORS.length;
+  return <div title={name} style={{width:size,height:size,borderRadius:"50%",background:AVATAR_COLORS[idx],border:"2px solid white",display:"flex",alignItems:"center",justifyContent:"center",fontSize:size*0.42,color:"white",fontWeight:700,flexShrink:0}}>{name[0]}</div>;
+}
+function AvatarGroup({assignees}){
+  if(assignees.length===TEAM.length) return <span style={{fontSize:12,fontWeight:700,padding:"2px 8px",borderRadius:20,background:GREEN_LIGHT,color:GREEN_DARK,border:`1px solid #a8d5b5`}}>🌿 Todos</span>;
+  return <div style={{display:"flex",alignItems:"center",gap:2}}>{assignees.map((a,i)=><div key={a} style={{marginLeft:i===0?0:-6}}><Avatar name={a}/></div>)}<span style={{fontSize:11,color:"#6b7280",marginLeft:4}}>{assignees.join(", ")}</span></div>;
+}
+function Logo({size=48}){
+  return(
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="50" r="48" stroke="white" strokeWidth="5" fill="none"/>
+      <path d="M28 68 Q24 58 28 52 Q32 47 36 50 L44 58" stroke="white" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+      <path d="M72 68 Q76 58 72 52 Q68 47 64 50 L56 58" stroke="white" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+      <path d="M36 50 Q40 44 50 62 Q60 44 64 50" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round"/>
+      <path d="M50 20 Q62 28 64 42 Q62 54 50 58 Q38 54 36 42 Q38 28 50 20Z" fill="white" opacity="0.9"/>
+      <text x="50" y="36" textAnchor="middle" fontSize="5.5" fill={GREEN} fontFamily="monospace" fontWeight="bold">1010</text>
+      <text x="50" y="43" textAnchor="middle" fontSize="5.5" fill={GREEN} fontFamily="monospace" fontWeight="bold">0111</text>
+      <text x="50" y="50" textAnchor="middle" fontSize="5.5" fill={GREEN} fontFamily="monospace" fontWeight="bold">1001</text>
+    </svg>
+  );
+}
 
-    function App(){
-      const [projects, setProjects] = useState([]);
-      const [loading, setLoading] = useState(true);
-      const [form, setForm] = useState(EMPTY);
-      const [editId, setEditId] = useState(null);
-      const [showForm, setShowForm] = useState(false);
-      const [filterStatus, setFilterStatus] = useState("Todos");
-      const [filterAssignee, setFilterAssignee] = useState("Todos");
-      const [filterCategory, setFilterCategory] = useState("Todas");
-      const [view, setView] = useState("tabla");
-      const [alertDays, setAlertDays] = useState(3);
+function DetailModal({project,onClose,onUpdate}){
+  const [tab,setTab]=useState("info");
+  const [newComment,setNewComment]=useState("");
+  const [newLinkLabel,setNewLinkLabel]=useState("");
+  const [newLinkUrl,setNewLinkUrl]=useState("");
+  const [newSubtask,setNewSubtask]=useState("");
 
-      useEffect(()=>{
-        try{ const raw=localStorage.getItem(STORAGE_KEY); setProjects(raw?JSON.parse(raw):INIT); }
-        catch{ setProjects(INIT); }
-        setLoading(false);
-      },[]);
+  function addComment(){if(!newComment.trim())return;onUpdate({...project,comments:[...project.comments,{id:Date.now(),author:"Abel",text:newComment,date:today}]});setNewComment("");}
+  function addLink(){if(!newLinkUrl.trim())return;onUpdate({...project,links:[...project.links,{id:Date.now(),label:newLinkLabel||newLinkUrl,url:newLinkUrl}]});setNewLinkLabel("");setNewLinkUrl("");}
+  function addSubtask(){if(!newSubtask.trim())return;onUpdate({...project,subtasks:[...project.subtasks,{id:Date.now(),text:newSubtask,done:false}]});setNewSubtask("");}
+  function toggleSubtask(id){const subs=project.subtasks.map(s=>s.id===id?{...s,done:!s.done}:s);const done=subs.filter(s=>s.done).length;onUpdate({...project,subtasks:subs,progress:subs.length>0?Math.round((done/subs.length)*100):project.progress});}
+  function removeSubtask(id){onUpdate({...project,subtasks:project.subtasks.filter(s=>s.id!==id)});}
+  function removeComment(id){onUpdate({...project,comments:project.comments.filter(c=>c.id!==id)});}
+  function removeLink(id){onUpdate({...project,links:project.links.filter(l=>l.id!==id)});}
 
-      useEffect(()=>{
-        if(loading) return;
-        try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(projects)); } catch{}
-      },[projects,loading]);
+  const iStyle={width:"100%",border:"1px solid #e5e7eb",borderRadius:8,padding:"8px 12px",fontSize:13,marginTop:4,boxSizing:"border-box"};
+  const tabs=[{k:"info",l:"ℹ️ Info"},{k:"subtasks",l:`✅ (${project.subtasks.length})`},{k:"comments",l:`💬 (${project.comments.length})`},{k:"links",l:`📎 (${project.links.length})`}];
 
-      const stats = useMemo(()=>({
-        total:projects.length,
-        pendiente:projects.filter(p=>p.status==="Pendiente").length,
-        progreso:projects.filter(p=>p.status==="En progreso").length,
-        listo:projects.filter(p=>p.status==="Listo").length,
-        vencidos:projects.filter(p=>isOverdue(p.deadline,p.status)).length,
-        avgProgress:projects.length?Math.round(projects.reduce((a,p)=>a+p.progress,0)/projects.length):0,
-      }),[projects]);
-
-      const alerts = useMemo(()=>projects.filter(p=>p.status!=="Listo"&&!isOverdue(p.deadline,p.status)&&daysUntil(p.deadline)<=alertDays),[projects,alertDays]);
-      const catStats = useMemo(()=>CATEGORIES.map(c=>({cat:c,count:projects.filter(p=>p.category===c).length})).filter(x=>x.count>0),[projects]);
-      const filtered = useMemo(()=>projects.filter(p=>(filterStatus==="Todos"||p.status===filterStatus)&&(filterAssignee==="Todos"||p.assignees.includes(filterAssignee))&&(filterCategory==="Todas"||p.category===filterCategory)),[projects,filterStatus,filterAssignee,filterCategory]);
-
-      function toggleAssignee(name){ setForm(f=>{ const has=f.assignees.includes(name); if(has&&f.assignees.length===1) return f; return{...f,assignees:has?f.assignees.filter(a=>a!==name):[...f.assignees,name]}; }); }
-      function toggleAll(){ setForm(f=>f.assignees.length===TEAM.length?{...f,assignees:[TEAM[0]]}:{...f,assignees:[...TEAM]}); }
-      function saveProject(){ if(!form.name.trim()) return; if(editId!==null){setProjects(ps=>ps.map(p=>p.id===editId?{...form,id:editId}:p));setEditId(null);}else setProjects(ps=>[...ps,{...form,id:Date.now()}]); setForm(EMPTY);setShowForm(false); }
-      function deleteProject(id){ setProjects(ps=>ps.filter(p=>p.id!==id)); }
-      function startEdit(p){ setForm({...p}); setEditId(p.id); setShowForm(true); }
-      function cycleStatus(id){ setProjects(ps=>ps.map(p=>p.id!==id?p:{...p,status:STATUSES[(STATUSES.indexOf(p.status)+1)%STATUSES.length]})); }
-      function printReport(){
-        const w=window.open("","_blank");
-        const rows=projects.map(p=>`<tr><td>${p.name}</td><td>${p.assignees.join(", ")}</td><td>${p.category}</td><td>${p.priority}</td><td>${p.status}</td><td>${p.progress}%</td><td>${p.deadline}</td></tr>`).join("");
-        w.document.write(`<html><head><title>Reporte IT</title><style>body{font-family:sans-serif;padding:24px}h1{color:#134522}table{width:100%;border-collapse:collapse;margin-top:16px}th{background:#134522;color:white;padding:8px;text-align:left}td{padding:8px;border-bottom:1px solid #e2e8f0}tr:nth-child(even){background:#f4fbf6}</style></head><body><h1>📊 Reporte IT – Parque Tempisque</h1><p>${new Date().toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p><p><b>Total:</b>${stats.total} | <b>Completados:</b>${stats.listo} | <b>En progreso:</b>${stats.progreso} | <b>Avance promedio:</b>${stats.avgProgress}%</p><table><thead><tr><th>Proyecto</th><th>Participantes</th><th>Categoría</th><th>Prioridad</th><th>Estado</th><th>Avance</th><th>Deadline</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
-        w.document.close();w.print();
-      }
-
-      const inputCls="w-full mt-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none";
-      if(loading) return <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:12,background:GREEN_LIGHT}}><Logo size={60}/><p style={{color:GREEN_DARK,fontWeight:600}}>Cargando...</p></div>;
-
-      return (
-        <div style={{minHeight:"100vh",background:GREEN_LIGHT,fontFamily:"sans-serif"}}>
-          <div style={{background:GREEN_DARK,color:"white",padding:"12px 24px"}}>
-            <div style={{maxWidth:960,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
-              <div style={{display:"flex",alignItems:"center",gap:12}}>
-                <Logo size={50}/>
-                <div>
-                  <p style={{fontSize:10,fontWeight:700,letterSpacing:2,color:"#7cc47a",textTransform:"uppercase",margin:0}}>Parque Tempisque</p>
-                  <h1 style={{margin:0,fontSize:18,fontWeight:800}}>Dashboard IT</h1>
-                  <p style={{margin:0,fontSize:11,color:"#a8d5b5"}}>Control de proyectos</p>
-                </div>
-              </div>
-              <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
-                <button onClick={printReport} style={{background:"rgba(255,255,255,0.15)",color:"white",border:"none",borderRadius:8,padding:"6px 12px",fontSize:12,fontWeight:600,cursor:"pointer"}}>📤 Exportar PDF</button>
-                {["tabla","resumen"].map(v=>(
-                  <button key={v} onClick={()=>setView(v)} style={{background:view===v?"white":"rgba(255,255,255,0.12)",color:view===v?GREEN_DARK:"white",border:"none",borderRadius:8,padding:"6px 12px",fontSize:12,fontWeight:600,cursor:"pointer"}}>
-                    {v==="tabla"?"📋 Tabla":"📊 Resumen Jefe"}
-                  </button>
-                ))}
+  return(
+    <div style={{position:"fixed",inset:0,zIndex:999,display:"flex",alignItems:"center",justifyContent:"center",padding:16,background:"rgba(0,0,0,0.55)"}}>
+      <div style={{background:"white",borderRadius:16,width:"100%",maxWidth:520,maxHeight:"90vh",overflowY:"auto",border:`2px solid #c6dfc9`}}>
+        <div style={{background:GREEN_DARK,padding:"16px 20px",borderRadius:"14px 14px 0 0"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+            <div>
+              <p style={{margin:0,fontSize:10,fontWeight:700,letterSpacing:2,color:"#7cc47a",textTransform:"uppercase"}}>Parque Tempisque · IT</p>
+              <h2 style={{margin:"4px 0",color:"white",fontSize:18,fontWeight:800}}>{project.name}</h2>
+              <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:4}}>
+                <Badge label={project.status} style={STATUS_STYLE[project.status]}/>
+                <Badge label={project.priority} style={PRIORITY_STYLE[project.priority]}/>
+                <Badge label={project.category} style={CATEGORY_STYLE[project.category]}/>
               </div>
             </div>
+            <button onClick={onClose} style={{background:"none",border:"none",color:"white",fontSize:20,cursor:"pointer",marginTop:4}}>✕</button>
           </div>
-          <div style={{height:4,background:`linear-gradient(90deg,${GREEN_MID},#7cc47a,${GREEN_MID})`}}/>
+        </div>
+        <div style={{display:"flex",borderBottom:`1px solid #c6dfc9`}}>
+          {tabs.map(t=>(
+            <button key={t.k} onClick={()=>setTab(t.k)} style={{flex:1,padding:"10px 4px",fontSize:12,fontWeight:700,border:"none",cursor:"pointer",background:tab===t.k?GREEN_LIGHT:"white",color:tab===t.k?GREEN_DARK:"#94a3b8",borderBottom:tab===t.k?`2px solid ${GREEN}`:"2px solid transparent"}}>
+              {t.l}
+            </button>
+          ))}
+        </div>
+        <div style={{padding:20}}>
+          {tab==="info"&&(
+            <div>
+              <div style={{marginBottom:12}}>
+                <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:GREEN_DARK,marginBottom:4}}><span>Avance</span><span style={{fontWeight:700}}>{project.progress}%</span></div>
+                <div style={{background:"#e2e8f0",borderRadius:6,height:8}}><div style={{height:8,borderRadius:6,background:project.progress===100?GREEN_MID:project.progress>=50?"#2563eb":"#f59e0b",width:`${project.progress}%`,transition:"width 0.3s"}}/></div>
+                <input type="range" min={0} max={100} value={project.progress} onChange={e=>onUpdate({...project,progress:+e.target.value})} style={{width:"100%",marginTop:6,accentColor:GREEN}}/>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
+                <div><p style={{fontSize:11,color:"#9ca3af",margin:"0 0 4px"}}>Deadline</p><p style={{fontSize:13,fontWeight:600,color:"#1f2937",margin:0}}>{project.deadline}{isOverdue(project.deadline,project.status)&&<span style={{color:"#ef4444",fontSize:11,marginLeft:6}}>⚠️ Vencido</span>}</p></div>
+                <div><p style={{fontSize:11,color:"#9ca3af",margin:"0 0 4px"}}>Participantes</p><AvatarGroup assignees={project.assignees}/></div>
+              </div>
+              {project.notes&&<div style={{background:GREEN_LIGHT,borderRadius:10,padding:"10px 14px",fontSize:13,color:"#374151"}}>{project.notes}</div>}
+            </div>
+          )}
+          {tab==="subtasks"&&(
+            <div>
+              {project.subtasks.length===0&&<p style={{textAlign:"center",color:"#9ca3af",fontSize:13,padding:"16px 0"}}>No hay subtareas aún</p>}
+              {project.subtasks.map(s=>(
+                <div key={s.id} style={{display:"flex",alignItems:"center",gap:10,background:GREEN_LIGHT,borderRadius:10,padding:"8px 12px",marginBottom:8}}>
+                  <input type="checkbox" checked={s.done} onChange={()=>toggleSubtask(s.id)} style={{width:16,height:16,accentColor:GREEN,cursor:"pointer"}}/>
+                  <span style={{flex:1,fontSize:13,color:s.done?"#9ca3af":"#374151",textDecoration:s.done?"line-through":"none"}}>{s.text}</span>
+                  <button onClick={()=>removeSubtask(s.id)} style={{background:"none",border:"none",color:"#f87171",cursor:"pointer",fontSize:14}}>✕</button>
+                </div>
+              ))}
+              <div style={{display:"flex",gap:8,marginTop:8}}>
+                <input value={newSubtask} onChange={e=>setNewSubtask(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addSubtask()} placeholder="Nueva subtarea..." style={iStyle}/>
+                <button onClick={addSubtask} style={{background:GREEN,color:"white",border:"none",borderRadius:8,padding:"8px 14px",fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>+ Agregar</button>
+              </div>
+              {project.subtasks.length>0&&<p style={{fontSize:11,color:GREEN_MID,textAlign:"center",marginTop:8}}>{project.subtasks.filter(s=>s.done).length}/{project.subtasks.length} completadas · El avance se actualiza automáticamente</p>}
+            </div>
+          )}
+          {tab==="comments"&&(
+            <div>
+              {project.comments.length===0&&<p style={{textAlign:"center",color:"#9ca3af",fontSize:13,padding:"16px 0"}}>No hay comentarios aún</p>}
+              {project.comments.map(c=>(
+                <div key={c.id} style={{background:GREEN_LIGHT,borderRadius:10,padding:"10px 14px",marginBottom:8}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                    <div style={{display:"flex",alignItems:"center",gap:8}}><Avatar name={c.author} size={20}/><span style={{fontSize:12,fontWeight:700,color:GREEN_DARK}}>{c.author}</span><span style={{fontSize:11,color:"#9ca3af"}}>{c.date}</span></div>
+                    <button onClick={()=>removeComment(c.id)} style={{background:"none",border:"none",color:"#f87171",cursor:"pointer"}}>✕</button>
+                  </div>
+                  <p style={{margin:0,fontSize:13,color:"#374151",paddingLeft:28}}>{c.text}</p>
+                </div>
+              ))}
+              <div style={{display:"flex",gap:8,marginTop:8}}>
+                <input value={newComment} onChange={e=>setNewComment(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addComment()} placeholder="Agregar comentario..." style={iStyle}/>
+                <button onClick={addComment} style={{background:GREEN,color:"white",border:"none",borderRadius:8,padding:"8px 14px",fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap"}}>+ Agregar</button>
+              </div>
+            </div>
+          )}
+          {tab==="links"&&(
+            <div>
+              {project.links.length===0&&<p style={{textAlign:"center",color:"#9ca3af",fontSize:13,padding:"16px 0"}}>No hay links adjuntos</p>}
+              {project.links.map(l=>(
+                <div key={l.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:GREEN_LIGHT,borderRadius:10,padding:"8px 14px",marginBottom:8}}>
+                  <a href={l.url} target="_blank" rel="noreferrer" style={{fontSize:13,fontWeight:600,color:GREEN_DARK,textDecoration:"none"}}>📎 {l.label}</a>
+                  <button onClick={()=>removeLink(l.id)} style={{background:"none",border:"none",color:"#f87171",cursor:"pointer"}}>✕</button>
+                </div>
+              ))}
+              <input value={newLinkLabel} onChange={e=>setNewLinkLabel(e.target.value)} placeholder="Etiqueta (ej. Manual de usuario)" style={iStyle}/>
+              <input value={newLinkUrl} onChange={e=>setNewLinkUrl(e.target.value)} placeholder="URL (https://...)" style={{...iStyle,marginTop:8}}/>
+              <button onClick={addLink} style={{background:GREEN,color:"white",border:"none",borderRadius:8,padding:"8px 14px",fontSize:12,fontWeight:700,cursor:"pointer",width:"100%",marginTop:8}}>+ Adjuntar link</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-          <div style={{maxWidth:960,margin:"0 auto",padding:"20px 16px"}}>
-            {/* KPIs */}
-            <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:12,marginBottom:16}}>
-              {[{l:"Total",v:stats.total,bg:GREEN_DARK},{l:"Pendientes",v:stats.pendiente,bg:"#64748b"},{l:"En progreso",v:stats.progreso,bg:"#2563eb"},{l:"Listos",v:stats.listo,bg:GREEN_MID},{l:"Avance prom.",v:`${stats.avgProgress}%`,bg:"#7c3aed"}].map(c=>(
-                <div key={c.l} style={{background:c.bg,color:"white",borderRadius:12,padding:"12px 8px",textAlign:"center",boxShadow:"0 1px 4px rgba(0,0,0,0.15)"}}>
-                  <div style={{fontSize:24,fontWeight:800}}>{c.v}</div>
-                  <div style={{fontSize:11,opacity:.85,marginTop:2}}>{c.l}</div>
+function CalendarView({projects}){
+  const [month,setMonth]=useState(new Date(today.slice(0,7)+"-01"));
+  const y=month.getFullYear(),m=month.getMonth();
+  const firstDay=new Date(y,m,1).getDay();
+  const daysInMonth=new Date(y,m+1,0).getDate();
+  const cells=Array(firstDay).fill(null).concat(Array.from({length:daysInMonth},(_,i)=>i+1));
+  while(cells.length%7!==0)cells.push(null);
+  const byDay={};
+  projects.forEach(p=>{const d=new Date(p.deadline);if(d.getFullYear()===y&&d.getMonth()===m){const day=d.getDate();if(!byDay[day])byDay[day]=[];byDay[day].push(p);}});
+  return(
+    <div style={{background:"white",borderRadius:16,overflow:"hidden",border:`1px solid #c6dfc9`}}>
+      <div style={{background:GREEN,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 20px"}}>
+        <button onClick={()=>setMonth(new Date(y,m-1,1))} style={{background:"none",border:"none",color:"white",fontSize:20,cursor:"pointer",fontWeight:700}}>‹</button>
+        <h3 style={{color:"white",margin:0,fontWeight:700}}>{month.toLocaleDateString("es-MX",{month:"long",year:"numeric"})}</h3>
+        <button onClick={()=>setMonth(new Date(y,m+1,1))} style={{background:"none",border:"none",color:"white",fontSize:20,cursor:"pointer",fontWeight:700}}>›</button>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",textAlign:"center",fontSize:12,fontWeight:700,padding:"8px 0",background:GREEN_LIGHT,color:GREEN_DARK}}>
+        {["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"].map(d=><div key={d}>{d}</div>)}
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:1,background:"#e2e8f0"}}>
+        {cells.map((day,i)=>{
+          const isToday=day&&`${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`===today;
+          const dayP=day?byDay[day]||[]:[];
+          return(
+            <div key={i} style={{minHeight:64,padding:4,background:day?(isToday?GREEN_LIGHT:"white"):"#f8fafc",fontSize:11}}>
+              {day&&<div style={{width:22,height:22,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",background:isToday?GREEN:"transparent",color:isToday?"white":GREEN_DARK,fontWeight:700,marginBottom:2}}>{day}</div>}
+              {dayP.map(p=><div key={p.id} style={{fontSize:10,borderRadius:4,padding:"1px 4px",marginBottom:2,background:isOverdue(p.deadline,p.status)?"#fee2e2":p.status==="Listo"?"#d1fae5":GREEN_LIGHT,color:isOverdue(p.deadline,p.status)?"#991b1b":GREEN_DARK,overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis"}} title={p.name}>{p.name}</div>)}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [projects,setProjects]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [saveStatus,setSaveStatus]=useState("idle");
+  const [form,setForm]=useState(EMPTY);
+  const [editId,setEditId]=useState(null);
+  const [showForm,setShowForm]=useState(false);
+  const [filterStatus,setFilterStatus]=useState("Todos");
+  const [filterAssignee,setFilterAssignee]=useState("Todos");
+  const [filterCategory,setFilterCategory]=useState("Todas");
+  const [view,setView]=useState("tabla");
+  const [detailProject,setDetailProject]=useState(null);
+  const [alertDays,setAlertDays]=useState(3);
+
+  useEffect(()=>{
+    try{const r=localStorage.getItem(STORAGE_KEY);setProjects(r?JSON.parse(r):INIT);}
+    catch{setProjects(INIT);}
+    setLoading(false);
+  },[]);
+
+  useEffect(()=>{
+    if(loading)return;
+    setSaveStatus("saving");
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify(projects));setSaveStatus("saved");setTimeout(()=>setSaveStatus("idle"),2000);}
+    catch{setSaveStatus("error");}
+  },[projects]);
+
+  const stats=useMemo(()=>({
+    total:projects.length,
+    pendiente:projects.filter(p=>p.status==="Pendiente").length,
+    progreso:projects.filter(p=>p.status==="En progreso").length,
+    listo:projects.filter(p=>p.status==="Listo").length,
+    vencidos:projects.filter(p=>isOverdue(p.deadline,p.status)).length,
+    avgProgress:projects.length?Math.round(projects.reduce((a,p)=>a+p.progress,0)/projects.length):0,
+  }),[projects]);
+
+  const alerts=useMemo(()=>projects.filter(p=>p.status!=="Listo"&&!isOverdue(p.deadline,p.status)&&daysUntil(p.deadline)<=alertDays),[projects,alertDays]);
+  const catStats=useMemo(()=>CATEGORIES.map(c=>({cat:c,count:projects.filter(p=>p.category===c).length})).filter(x=>x.count>0),[projects]);
+  const filtered=useMemo(()=>projects.filter(p=>(filterStatus==="Todos"||p.status===filterStatus)&&(filterAssignee==="Todos"||p.assignees.includes(filterAssignee))&&(filterCategory==="Todas"||p.category===filterCategory)),[projects,filterStatus,filterAssignee,filterCategory]);
+
+  function toggleAssignee(name){setForm(f=>{const has=f.assignees.includes(name);if(has&&f.assignees.length===1)return f;return{...f,assignees:has?f.assignees.filter(a=>a!==name):[...f.assignees,name]};});}
+  function toggleAll(){setForm(f=>f.assignees.length===TEAM.length?{...f,assignees:[TEAM[0]]}:{...f,assignees:[...TEAM]});}
+  function saveProject(){if(!form.name.trim())return;if(editId!==null){setProjects(ps=>ps.map(p=>p.id===editId?{...form,id:editId}:p));setEditId(null);}else setProjects(ps=>[...ps,{...form,id:Date.now()}]);setForm(EMPTY);setShowForm(false);}
+  function deleteProject(id){setProjects(ps=>ps.filter(p=>p.id!==id));if(detailProject?.id===id)setDetailProject(null);}
+  function startEdit(p){setForm({...p});setEditId(p.id);setShowForm(true);}
+  function cycleStatus(id){setProjects(ps=>ps.map(p=>p.id!==id?p:{...p,status:STATUSES[(STATUSES.indexOf(p.status)+1)%STATUSES.length]}));}
+  function updateProject(updated){setProjects(ps=>ps.map(p=>p.id===updated.id?updated:p));setDetailProject(updated);}
+  function printReport(){
+    const w=window.open("","_blank");
+    const rows=projects.map(p=>`<tr><td>${p.name}</td><td>${p.assignees.join(", ")}</td><td>${p.category}</td><td>${p.priority}</td><td>${p.status}</td><td>${p.progress}%</td><td>${p.deadline}</td></tr>`).join("");
+    w.document.write(`<html><head><title>Reporte IT – Parque Tempisque</title><style>body{font-family:sans-serif;padding:24px}h1{color:#134522}table{width:100%;border-collapse:collapse;margin-top:16px}th{background:#134522;color:white;padding:8px;text-align:left}td{padding:8px;border-bottom:1px solid #e2e8f0}tr:nth-child(even){background:#f4fbf6}</style></head><body><h1>📊 Reporte Departamento IT</h1><h3 style="color:#2d7a45;margin-top:0">Parque Tempisque</h3><p>${new Date().toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p><p><b>Total:</b> ${stats.total} &nbsp;|&nbsp; <b>Completados:</b> ${stats.listo} &nbsp;|&nbsp; <b>En progreso:</b> ${stats.progreso} &nbsp;|&nbsp; <b>Pendientes:</b> ${stats.pendiente} &nbsp;|&nbsp; <b>Avance promedio:</b> ${stats.avgProgress}%</p><table><thead><tr><th>Proyecto</th><th>Participantes</th><th>Categoría</th><th>Prioridad</th><th>Estado</th><th>Avance</th><th>Deadline</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+    w.document.close();w.print();
+  }
+
+  const S={input:{width:"100%",border:"1px solid #e5e7eb",borderRadius:8,padding:"8px 12px",fontSize:13,marginTop:4,boxSizing:"border-box"},select:{width:"100%",border:"1px solid #e5e7eb",borderRadius:8,padding:"8px 12px",fontSize:13,marginTop:4}};
+  const VIEWS=[{k:"tabla",l:"📋 Tabla"},{k:"calendario",l:"📅 Calendario"},{k:"resumen",l:"📊 Resumen Jefe"}];
+
+  if(loading)return<div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:12,background:GREEN_LIGHT}}><Logo size={64}/><p style={{color:GREEN_DARK,fontWeight:700,fontSize:15}}>Cargando proyectos...</p></div>;
+
+  return(
+    <div style={{minHeight:"100vh",background:GREEN_LIGHT,fontFamily:"sans-serif"}}>
+      {detailProject&&<DetailModal project={detailProject} onClose={()=>setDetailProject(null)} onUpdate={updateProject}/>}
+
+      {/* HEADER */}
+      <div style={{background:GREEN_DARK,padding:"12px 24px"}}>
+        <div style={{maxWidth:1000,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
+          <div style={{display:"flex",alignItems:"center",gap:14}}>
+            <Logo size={52}/>
+            <div>
+              <p style={{margin:0,fontSize:10,fontWeight:800,letterSpacing:3,color:"#7cc47a",textTransform:"uppercase"}}>Parque Tempisque</p>
+              <h1 style={{margin:0,fontSize:20,fontWeight:800,color:"white"}}>Dashboard IT</h1>
+              <p style={{margin:0,fontSize:11,color:"#a8d5b5"}}>Control de proyectos y tareas</p>
+            </div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+            <div style={{fontSize:11,padding:"4px 12px",borderRadius:20,fontWeight:600,background:saveStatus==="saved"?"#d1fae5":saveStatus==="saving"?"#fef9c3":saveStatus==="error"?"#fee2e2":"rgba(255,255,255,0.1)",color:saveStatus==="saved"?"#065f46":saveStatus==="saving"?"#854d0e":saveStatus==="error"?"#991b1b":"#a8d5b5"}}>
+              {saveStatus==="saving"?"💾 Guardando...":saveStatus==="saved"?"✅ Guardado":saveStatus==="error"?"❌ Error":"💾 Auto-guardado"}
+            </div>
+            <button onClick={printReport} style={{background:"rgba(255,255,255,0.15)",color:"white",border:"none",borderRadius:8,padding:"7px 14px",fontSize:12,fontWeight:600,cursor:"pointer"}}>📤 Exportar PDF</button>
+            <div style={{display:"flex",gap:4}}>
+              {VIEWS.map(v=><button key={v.k} onClick={()=>setView(v.k)} style={{background:view===v.k?"white":"rgba(255,255,255,0.12)",color:view===v.k?GREEN_DARK:"white",border:"none",borderRadius:8,padding:"7px 12px",fontSize:12,fontWeight:600,cursor:"pointer"}}>{v.l}</button>)}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style={{height:4,background:`linear-gradient(90deg,${GREEN_MID},#7cc47a,${GREEN_MID})`}}/>
+
+      <div style={{maxWidth:1000,margin:"0 auto",padding:"20px 16px"}}>
+
+        {/* KPIs */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:12,marginBottom:16}}>
+          {[{l:"Total",v:stats.total,bg:GREEN_DARK},{l:"Pendientes",v:stats.pendiente,bg:"#64748b"},{l:"En progreso",v:stats.progreso,bg:"#2563eb"},{l:"Listos",v:stats.listo,bg:GREEN_MID},{l:"Avance prom.",v:`${stats.avgProgress}%`,bg:"#7c3aed"}].map(c=>(
+            <div key={c.l} style={{background:c.bg,color:"white",borderRadius:12,padding:"12px 8px",textAlign:"center",boxShadow:"0 1px 4px rgba(0,0,0,0.12)"}}>
+              <div style={{fontSize:26,fontWeight:800}}>{c.v}</div>
+              <div style={{fontSize:11,opacity:.85,marginTop:2}}>{c.l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Alertas */}
+        {alerts.length>0&&(
+          <div style={{background:"#fefce8",border:"1px solid #fbbf24",borderRadius:12,padding:"10px 16px",marginBottom:12}}>
+            <p style={{margin:"0 0 4px",fontSize:12,fontWeight:700,color:"#92400e"}}>🔔 Vencen en los próximos <select value={alertDays} onChange={e=>setAlertDays(+e.target.value)} style={{border:"1px solid #fbbf24",borderRadius:4,padding:"1px 4px",fontSize:12,margin:"0 4px"}}>{[1,2,3,5,7].map(d=><option key={d} value={d}>{d} días</option>)}</select></p>
+            {alerts.map(p=><p key={p.id} style={{margin:"2px 0 0 8px",fontSize:12,color:"#b45309"}}>• <b>{p.name}</b> — {p.deadline} ({daysUntil(p.deadline)}d restantes)</p>)}
+          </div>
+        )}
+        {stats.vencidos>0&&<div style={{background:"#fef2f2",border:"1px solid #fca5a5",borderRadius:12,padding:"10px 16px",marginBottom:12,color:"#991b1b",fontSize:13}}>⚠️ <b>{stats.vencidos}</b> tarea(s) con deadline vencido</div>}
+
+        {/* Categorías */}
+        {catStats.length>0&&(
+          <div style={{display:"flex",flexWrap:"wrap",gap:8,alignItems:"center",marginBottom:12}}>
+            <span style={{fontSize:12,fontWeight:700,color:GREEN_DARK}}>Categorías:</span>
+            {catStats.map(x=>(
+              <button key={x.cat} onClick={()=>setFilterCategory(filterCategory===x.cat?"Todas":x.cat)}
+                className={`${CATEGORY_STYLE[x.cat]}`}
+                style={{fontSize:12,fontWeight:700,padding:"3px 10px",borderRadius:20,cursor:"pointer",outline:filterCategory===x.cat?`2px solid ${GREEN}`:"none",outlineOffset:2}}>
+                {x.cat} <span style={{background:"rgba(255,255,255,0.6)",borderRadius:10,padding:"0 5px"}}>{x.count}</span>
+              </button>
+            ))}
+            {filterCategory!=="Todas"&&<button onClick={()=>setFilterCategory("Todas")} style={{fontSize:12,color:GREEN,background:"none",border:"none",cursor:"pointer",textDecoration:"underline"}}>limpiar</button>}
+          </div>
+        )}
+
+        {/* ── TABLA ── */}
+        {view==="tabla"&&(
+          <>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8,marginBottom:12}}>
+              <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                {[{v:filterStatus,s:setFilterStatus,o:["Todos",...STATUSES]},{v:filterAssignee,s:setFilterAssignee,o:["Todos",...TEAM]},{v:filterCategory,s:setFilterCategory,o:["Todas",...CATEGORIES]}].map((f,i)=>(
+                  <select key={i} value={f.v} onChange={e=>f.s(e.target.value)} style={{fontSize:12,border:"1px solid #c6dfc9",borderRadius:8,padding:"6px 10px",background:"white"}}>
+                    {f.o.map(o=><option key={o}>{o}</option>)}
+                  </select>
+                ))}
+              </div>
+              <button onClick={()=>{setForm(EMPTY);setEditId(null);setShowForm(true);}} style={{background:GREEN,color:"white",border:"none",borderRadius:8,padding:"8px 18px",fontSize:12,fontWeight:700,cursor:"pointer"}}>+ Nuevo proyecto</button>
+            </div>
+
+            {showForm&&(
+              <div style={{background:"white",border:`1px solid #c6dfc9`,borderRadius:16,padding:20,marginBottom:16}}>
+                <h3 style={{margin:"0 0 14px",color:GREEN_DARK}}>{editId?"✏️ Editar proyecto":"➕ Nuevo proyecto"}</h3>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                  <div style={{gridColumn:"1/-1"}}><label style={{fontSize:11,color:"#6b7280",fontWeight:600}}>Nombre *</label><input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} style={S.input} placeholder="Ej. Instalación antivirus"/></div>
+                  <div style={{gridColumn:"1/-1"}}>
+                    <label style={{fontSize:11,color:"#6b7280",fontWeight:600,display:"block",marginBottom:8}}>Participantes</label>
+                    <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                      <button onClick={toggleAll} style={{background:form.assignees.length===TEAM.length?GREEN:GREEN_LIGHT,color:form.assignees.length===TEAM.length?"white":GREEN_DARK,border:`1px solid #a8d5b5`,borderRadius:20,padding:"5px 14px",fontSize:12,fontWeight:700,cursor:"pointer"}}>🌿 Todo el equipo</button>
+                      {TEAM.map(name=>{const sel=form.assignees.includes(name);return<button key={name} onClick={()=>toggleAssignee(name)} style={{background:sel?GREEN:"white",color:sel?"white":GREEN_DARK,border:`1px solid ${sel?GREEN:"#c6dfc9"}`,borderRadius:20,padding:"5px 12px",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}><Avatar name={name} size={16}/>{name}</button>;})}
+                    </div>
+                  </div>
+                  {[{l:"Categoría",k:"category",o:CATEGORIES},{l:"Prioridad",k:"priority",o:PRIORITIES},{l:"Estado",k:"status",o:STATUSES}].map(f=>(
+                    <div key={f.k}><label style={{fontSize:11,color:"#6b7280",fontWeight:600}}>{f.l}</label><select value={form[f.k]} onChange={e=>setForm(ff=>({...ff,[f.k]:e.target.value}))} style={S.select}>{f.o.map(o=><option key={o}>{o}</option>)}</select></div>
+                  ))}
+                  <div><label style={{fontSize:11,color:"#6b7280",fontWeight:600}}>Deadline</label><input type="date" value={form.deadline} onChange={e=>setForm(f=>({...f,deadline:e.target.value}))} style={S.input}/></div>
+                  <div style={{gridColumn:"1/-1"}}><label style={{fontSize:11,color:"#6b7280",fontWeight:600}}>Avance: {form.progress}%</label><input type="range" min={0} max={100} value={form.progress} onChange={e=>setForm(f=>({...f,progress:+e.target.value}))} style={{width:"100%",marginTop:6,accentColor:GREEN}}/></div>
+                  <div style={{gridColumn:"1/-1"}}><label style={{fontSize:11,color:"#6b7280",fontWeight:600}}>Notas</label><input value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} style={S.input} placeholder="Opcional"/></div>
+                </div>
+                <div style={{display:"flex",gap:8,marginTop:14}}>
+                  <button onClick={saveProject} style={{background:GREEN,color:"white",border:"none",borderRadius:8,padding:"8px 22px",fontSize:13,fontWeight:700,cursor:"pointer"}}>{editId?"Guardar cambios":"Agregar"}</button>
+                  <button onClick={()=>{setShowForm(false);setEditId(null);}} style={{background:"white",color:"#6b7280",border:"1px solid #e5e7eb",borderRadius:8,padding:"8px 16px",fontSize:13,cursor:"pointer"}}>Cancelar</button>
+                </div>
+              </div>
+            )}
+
+            <div style={{background:"white",borderRadius:16,overflow:"hidden",border:`1px solid #c6dfc9`,boxShadow:"0 1px 4px rgba(0,0,0,0.06)"}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+                <thead><tr style={{background:GREEN,color:"white"}}>
+                  {["Proyecto","Participantes","Categoría","Prioridad","Estado","Avance","Deadline",""].map(h=><th key={h} style={{textAlign:"left",padding:"10px 16px",fontSize:11,fontWeight:700,textTransform:"uppercase",whiteSpace:"nowrap"}}>{h}</th>)}
+                </tr></thead>
+                <tbody>
+                  {filtered.length===0&&<tr><td colSpan={8} style={{textAlign:"center",color:"#9ca3af",padding:32}}>No hay proyectos con estos filtros</td></tr>}
+                  {filtered.map((p,i)=>(
+                    <tr key={p.id} style={{background:i%2===0?"white":"#f4fbf6",borderBottom:"1px solid #e8f5ee"}}>
+                      <td style={{padding:"10px 16px"}}>
+                        <div style={{fontWeight:600,color:"#1f2937"}}>{p.name}</div>
+                        {p.subtasks.length>0&&<div style={{fontSize:11,color:"#9ca3af",marginTop:2}}>{p.subtasks.filter(s=>s.done).length}/{p.subtasks.length} subtareas</div>}
+                        {isOverdue(p.deadline,p.status)&&<span style={{fontSize:11,color:"#ef4444",fontWeight:700}}>⚠️ Vencido</span>}
+                      </td>
+                      <td style={{padding:"10px 16px"}}><AvatarGroup assignees={p.assignees}/></td>
+                      <td style={{padding:"10px 16px"}}><Badge label={p.category} style={CATEGORY_STYLE[p.category]}/></td>
+                      <td style={{padding:"10px 16px"}}><Badge label={p.priority} style={PRIORITY_STYLE[p.priority]}/></td>
+                      <td style={{padding:"10px 16px"}}><button onClick={()=>cycleStatus(p.id)} style={{background:"none",border:"none",cursor:"pointer",padding:0}}><Badge label={p.status} style={STATUS_STYLE[p.status]}/></button></td>
+                      <td style={{padding:"10px 16px"}}>
+                        <div style={{width:80}}>
+                          <div style={{fontSize:11,color:GREEN_DARK,marginBottom:2,fontWeight:600}}>{p.progress}%</div>
+                          <div style={{background:"#e2e8f0",borderRadius:4,height:6}}><div style={{height:6,borderRadius:4,background:p.progress===100?GREEN_MID:p.progress>=50?"#2563eb":"#f59e0b",width:`${p.progress}%`}}/></div>
+                        </div>
+                      </td>
+                      <td style={{padding:"10px 16px",color:"#6b7280",fontSize:12,whiteSpace:"nowrap"}}>{p.deadline}</td>
+                      <td style={{padding:"10px 16px"}}>
+                        <div style={{display:"flex",gap:8}}>
+                          <button onClick={()=>setDetailProject(p)} style={{background:"none",border:"none",color:GREEN,fontSize:12,fontWeight:600,cursor:"pointer"}}>Ver</button>
+                          <button onClick={()=>startEdit(p)} style={{background:"none",border:"none",color:"#3b82f6",fontSize:12,fontWeight:600,cursor:"pointer"}}>Editar</button>
+                          <button onClick={()=>deleteProject(p.id)} style={{background:"none",border:"none",color:"#f87171",fontSize:12,fontWeight:600,cursor:"pointer"}}>✕</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p style={{fontSize:11,color:GREEN_MID,textAlign:"center",marginTop:8}}>💡 Clic en "Ver" para bitácora, links y subtareas · Clic en el estado para cambiarlo · Datos guardados en este navegador</p>
+          </>
+        )}
+
+        {/* ── CALENDARIO ── */}
+        {view==="calendario"&&<CalendarView projects={projects}/>}
+
+        {/* ── RESUMEN JEFE ── */}
+        {view==="resumen"&&(
+          <div style={{background:"white",borderRadius:16,padding:24,border:`1px solid #c6dfc9`}}>
+            <div style={{display:"flex",alignItems:"center",gap:16,borderBottom:`1px solid #c6dfc9`,paddingBottom:16,marginBottom:20}}>
+              <Logo size={52}/>
+              <div>
+                <h2 style={{margin:0,color:GREEN_DARK,fontSize:20,fontWeight:800}}>Reporte Departamento IT</h2>
+                <p style={{margin:0,color:GREEN_MID,fontSize:12,fontWeight:700}}>Parque Tempisque</p>
+                <p style={{margin:0,color:"#9ca3af",fontSize:12}}>{new Date().toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p>
+              </div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:12,marginBottom:20}}>
+              {[{l:"Total",v:stats.total,c:GREEN_DARK},{l:"Pendientes",v:stats.pendiente,c:"#64748b"},{l:"En progreso",v:stats.progreso,c:"#2563eb"},{l:"Completados",v:stats.listo,c:GREEN_MID},{l:"Avance prom.",v:`${stats.avgProgress}%`,c:"#7c3aed"}].map(x=>(
+                <div key={x.l} style={{border:`1px solid #c6dfc9`,borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
+                  <div style={{fontSize:24,fontWeight:800,color:x.c}}>{x.v}</div>
+                  <div style={{fontSize:11,color:"#9ca3af",marginTop:2}}>{x.l}</div>
                 </div>
               ))}
             </div>
-
-            {/* Alerts */}
-            {alerts.length>0&&(
-              <div style={{background:"#fefce8",border:"1px solid #fbbf24",borderRadius:12,padding:"8px 16px",marginBottom:12}}>
-                <p style={{color:"#92400e",fontSize:12,fontWeight:600,margin:"0 0 4px"}}>🔔 Vencen pronto (en {alertDays} días o menos)</p>
-                {alerts.map(p=><p key={p.id} style={{color:"#b45309",fontSize:12,margin:"2px 0 0 8px"}}>• <b>{p.name}</b> — {p.deadline} ({daysUntil(p.deadline)}d)</p>)}
+            <div style={{marginBottom:16}}>
+              <h3 style={{fontSize:13,fontWeight:700,color:GREEN_DARK,marginBottom:8}}>📁 Por categoría</h3>
+              <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+                {catStats.map(x=><span key={x.cat} className={CATEGORY_STYLE[x.cat]} style={{fontSize:12,fontWeight:700,padding:"3px 10px",borderRadius:20}}>{x.cat} <span style={{background:"rgba(255,255,255,0.6)",borderRadius:10,padding:"0 5px"}}>{x.count}</span></span>)}
               </div>
-            )}
-            {stats.vencidos>0&&<div style={{background:"#fef2f2",border:"1px solid #fca5a5",borderRadius:12,padding:"8px 16px",marginBottom:12,color:"#991b1b",fontSize:13}}>⚠️ <b>{stats.vencidos}</b> tarea(s) vencidas</div>}
-
-            {/* TABLA */}
-            {view==="tabla"&&(<>
-              <div style={{display:"flex",gap:8,flexWrap:"wrap",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-                <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                  {[{v:filterStatus,s:setFilterStatus,o:["Todos",...STATUSES]},{v:filterAssignee,s:setFilterAssignee,o:["Todos",...TEAM]},{v:filterCategory,s:setFilterCategory,o:["Todas",...CATEGORIES]}].map((f,i)=>(
-                    <select key={i} value={f.v} onChange={e=>f.s(e.target.value)} style={{fontSize:12,border:"1px solid #c6dfc9",borderRadius:8,padding:"6px 8px",background:"white"}}>
-                      {f.o.map(o=><option key={o}>{o}</option>)}
-                    </select>
-                  ))}
-                </div>
-                <button onClick={()=>{setForm(EMPTY);setEditId(null);setShowForm(true);}} style={{background:GREEN,color:"white",border:"none",borderRadius:8,padding:"7px 16px",fontSize:12,fontWeight:700,cursor:"pointer"}}>+ Nuevo proyecto</button>
-              </div>
-
-              {showForm&&(
-                <div style={{background:"white",border:"1px solid #c6dfc9",borderRadius:16,padding:20,marginBottom:16}}>
-                  <h3 style={{color:GREEN_DARK,margin:"0 0 12px"}}>{editId?"✏️ Editar":"➕ Nuevo proyecto"}</h3>
-                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-                    <div style={{gridColumn:"1/-1"}}><label style={{fontSize:11,color:"#6b7280",fontWeight:600}}>Nombre *</label><input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} style={{width:"100%",marginTop:4,border:"1px solid #e5e7eb",borderRadius:8,padding:"8px 12px",fontSize:13,boxSizing:"border-box"}} placeholder="Ej. Instalación antivirus"/></div>
-                    <div style={{gridColumn:"1/-1"}}>
-                      <label style={{fontSize:11,color:"#6b7280",fontWeight:600,display:"block",marginBottom:8}}>Participantes</label>
-                      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                        <button onClick={toggleAll} style={{background:form.assignees.length===TEAM.length?GREEN:GREEN_LIGHT,color:form.assignees.length===TEAM.length?"white":GREEN_DARK,border:`1px solid #a8d5b5`,borderRadius:20,padding:"5px 12px",fontSize:12,fontWeight:700,cursor:"pointer"}}>🌿 Todo el equipo</button>
-                        {TEAM.map(name=>{ const s=form.assignees.includes(name); return <button key={name} onClick={()=>toggleAssignee(name)} style={{background:s?GREEN:"white",color:s?"white":GREEN_DARK,border:`1px solid ${s?GREEN:"#c6dfc9"}`,borderRadius:20,padding:"5px 12px",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}><Avatar name={name} size={16}/>{name}</button>; })}
+            </div>
+            {stats.vencidos>0&&<div style={{background:"#fef2f2",border:"1px solid #fca5a5",borderRadius:12,padding:"10px 16px",marginBottom:16,color:"#991b1b",fontSize:13}}>⚠️ Hay <b>{stats.vencidos}</b> tarea(s) con fecha vencida.</div>}
+            {TEAM.map(member=>{
+              const tasks=projects.filter(p=>p.assignees.includes(member));
+              if(!tasks.length)return null;
+              return(
+                <div key={member} style={{marginBottom:16}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}><Avatar name={member} size={26}/><h3 style={{margin:0,color:GREEN_DARK,fontSize:15}}>{member}</h3><span style={{fontSize:12,color:"#9ca3af"}}>({tasks.length} tarea{tasks.length>1?"s":""})</span></div>
+                  {tasks.map(p=>(
+                    <div key={p.id} style={{background:GREEN_LIGHT,borderRadius:12,padding:"10px 16px",marginBottom:6}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
+                        <div>
+                          <span style={{fontWeight:600,fontSize:13,color:"#1f2937"}}>{p.name}</span>
+                          {p.assignees.length>1&&<span style={{fontSize:11,color:GREEN_MID,marginLeft:8}}>🌿 +{p.assignees.filter(a=>a!==member).join(", ")}</span>}
+                          {isOverdue(p.deadline,p.status)&&<span style={{fontSize:11,color:"#ef4444",fontWeight:700,marginLeft:8}}>⚠️</span>}
+                        </div>
+                        <div style={{display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
+                          <Badge label={p.category} style={CATEGORY_STYLE[p.category]}/>
+                          <Badge label={p.priority} style={PRIORITY_STYLE[p.priority]}/>
+                          <Badge label={p.status} style={STATUS_STYLE[p.status]}/>
+                          <span style={{fontSize:11,color:"#9ca3af"}}>{p.deadline}</span>
+                        </div>
+                      </div>
+                      <div style={{marginTop:8}}>
+                        <div style={{background:"#d1fae5",borderRadius:4,height:6}}><div style={{height:6,borderRadius:4,background:p.progress===100?GREEN_MID:p.progress>=50?"#2563eb":"#f59e0b",width:`${p.progress}%`}}/></div>
+                        <p style={{textAlign:"right",fontSize:11,color:GREEN_MID,margin:"3px 0 0"}}>{p.progress}% completado</p>
                       </div>
                     </div>
-                    {[{l:"Categoría",k:"category",o:CATEGORIES},{l:"Prioridad",k:"priority",o:PRIORITIES},{l:"Estado",k:"status",o:STATUSES}].map(f=>(
-                      <div key={f.k}><label style={{fontSize:11,color:"#6b7280",fontWeight:600}}>{f.l}</label><select value={form[f.k]} onChange={e=>setForm(ff=>({...ff,[f.k]:e.target.value}))} style={{width:"100%",marginTop:4,border:"1px solid #e5e7eb",borderRadius:8,padding:"8px 12px",fontSize:13}}>{f.o.map(o=><option key={o}>{o}</option>)}</select></div>
-                    ))}
-                    <div><label style={{fontSize:11,color:"#6b7280",fontWeight:600}}>Deadline</label><input type="date" value={form.deadline} onChange={e=>setForm(f=>({...f,deadline:e.target.value}))} style={{width:"100%",marginTop:4,border:"1px solid #e5e7eb",borderRadius:8,padding:"8px 12px",fontSize:13}}/></div>
-                    <div style={{gridColumn:"1/-1"}}><label style={{fontSize:11,color:"#6b7280",fontWeight:600}}>Avance: {form.progress}%</label><input type="range" min={0} max={100} value={form.progress} onChange={e=>setForm(f=>({...f,progress:+e.target.value}))} style={{width:"100%",marginTop:6,accentColor:GREEN}}/></div>
-                    <div style={{gridColumn:"1/-1"}}><label style={{fontSize:11,color:"#6b7280",fontWeight:600}}>Notas</label><input value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} style={{width:"100%",marginTop:4,border:"1px solid #e5e7eb",borderRadius:8,padding:"8px 12px",fontSize:13,boxSizing:"border-box"}} placeholder="Opcional"/></div>
-                  </div>
-                  <div style={{display:"flex",gap:8,marginTop:12}}>
-                    <button onClick={saveProject} style={{background:GREEN,color:"white",border:"none",borderRadius:8,padding:"8px 20px",fontSize:13,fontWeight:700,cursor:"pointer"}}>{editId?"Guardar":"Agregar"}</button>
-                    <button onClick={()=>{setShowForm(false);setEditId(null);}} style={{background:"white",color:"#6b7280",border:"1px solid #e5e7eb",borderRadius:8,padding:"8px 16px",fontSize:13,cursor:"pointer"}}>Cancelar</button>
-                  </div>
-                </div>
-              )}
-
-              <div style={{background:"white",borderRadius:16,boxShadow:"0 1px 4px rgba(0,0,0,0.08)",overflow:"hidden",border:"1px solid #c6dfc9"}}>
-                <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
-                  <thead><tr style={{background:GREEN,color:"white"}}>
-                    {["Proyecto","Participantes","Categoría","Prioridad","Estado","Avance","Deadline",""].map(h=><th key={h} style={{textAlign:"left",padding:"10px 16px",fontSize:11,fontWeight:700,textTransform:"uppercase"}}>{h}</th>)}
-                  </tr></thead>
-                  <tbody>
-                    {filtered.length===0&&<tr><td colSpan={8} style={{textAlign:"center",color:"#9ca3af",padding:32}}>No hay proyectos</td></tr>}
-                    {filtered.map((p,i)=>(
-                      <tr key={p.id} style={{background:i%2===0?"white":"#f4fbf6",borderBottom:"1px solid #e8f5ee"}}>
-                        <td style={{padding:"10px 16px"}}><div style={{fontWeight:600,color:"#1f2937"}}>{p.name}</div>{isOverdue(p.deadline,p.status)&&<span style={{fontSize:11,color:"#ef4444",fontWeight:700}}>⚠️ Vencido</span>}</td>
-                        <td style={{padding:"10px 16px"}}><AvatarGroup assignees={p.assignees}/></td>
-                        <td style={{padding:"10px 16px"}}><Badge label={p.category} style={CATEGORY_STYLE[p.category]}/></td>
-                        <td style={{padding:"10px 16px"}}><Badge label={p.priority} style={PRIORITY_STYLE[p.priority]}/></td>
-                        <td style={{padding:"10px 16px"}}><button onClick={()=>cycleStatus(p.id)} style={{background:"none",border:"none",cursor:"pointer",padding:0}}><Badge label={p.status} style={STATUS_STYLE[p.status]}/></button></td>
-                        <td style={{padding:"10px 16px"}}>
-                          <div style={{width:80}}>
-                            <div style={{fontSize:11,color:GREEN_DARK,marginBottom:2}}>{p.progress}%</div>
-                            <div style={{background:"#e2e8f0",borderRadius:4,height:6}}><div style={{height:6,borderRadius:4,background:p.progress===100?GREEN_MID:p.progress>=50?"#2563eb":"#f59e0b",width:`${p.progress}%`}}/></div>
-                          </div>
-                        </td>
-                        <td style={{padding:"10px 16px",color:"#6b7280",fontSize:12}}>{p.deadline}</td>
-                        <td style={{padding:"10px 16px"}}>
-                          <div style={{display:"flex",gap:8}}>
-                            <button onClick={()=>startEdit(p)} style={{background:"none",border:"none",color:GREEN,fontSize:12,fontWeight:600,cursor:"pointer"}}>Editar</button>
-                            <button onClick={()=>deleteProject(p.id)} style={{background:"none",border:"none",color:"#f87171",fontSize:12,fontWeight:600,cursor:"pointer"}}>✕</button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </>)}
-
-            {/* RESUMEN JEFE */}
-            {view==="resumen"&&(
-              <div style={{background:"white",borderRadius:16,padding:24,border:"1px solid #c6dfc9"}}>
-                <div style={{display:"flex",alignItems:"center",gap:16,borderBottom:"1px solid #c6dfc9",paddingBottom:16,marginBottom:16}}>
-                  <Logo size={52}/>
-                  <div>
-                    <h2 style={{margin:0,color:GREEN_DARK}}>Reporte Departamento IT</h2>
-                    <p style={{margin:0,color:GREEN_MID,fontSize:12,fontWeight:600}}>Parque Tempisque</p>
-                    <p style={{margin:0,color:"#9ca3af",fontSize:12}}>{new Date().toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p>
-                  </div>
-                </div>
-                <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:12,marginBottom:20}}>
-                  {[{l:"Total",v:stats.total,c:GREEN_DARK},{l:"Pendientes",v:stats.pendiente,c:"#64748b"},{l:"En progreso",v:stats.progreso,c:"#2563eb"},{l:"Completados",v:stats.listo,c:GREEN_MID},{l:"Avance prom.",v:`${stats.avgProgress}%`,c:"#7c3aed"}].map(x=>(
-                    <div key={x.l} style={{border:"1px solid #c6dfc9",borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
-                      <div style={{fontSize:22,fontWeight:800,color:x.c}}>{x.v}</div>
-                      <div style={{fontSize:11,color:"#9ca3af",marginTop:2}}>{x.l}</div>
-                    </div>
                   ))}
                 </div>
-                {TEAM.map(member=>{
-                  const tasks=projects.filter(p=>p.assignees.includes(member));
-                  if(!tasks.length) return null;
-                  return (
-                    <div key={member} style={{marginBottom:16}}>
-                      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}><Avatar name={member} size={26}/><h3 style={{margin:0,color:GREEN_DARK}}>{member}</h3><span style={{fontSize:12,color:"#9ca3af"}}>({tasks.length} tarea{tasks.length>1?"s":""})</span></div>
-                      {tasks.map(p=>(
-                        <div key={p.id} style={{background:GREEN_LIGHT,borderRadius:12,padding:"8px 16px",marginBottom:6}}>
-                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8}}>
-                            <span style={{fontWeight:600,fontSize:13,color:"#1f2937"}}>{p.name}{isOverdue(p.deadline,p.status)&&<span style={{color:"#ef4444",fontSize:11,marginLeft:8}}>⚠️</span>}</span>
-                            <div style={{display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
-                              <Badge label={p.category} style={CATEGORY_STYLE[p.category]}/>
-                              <Badge label={p.priority} style={PRIORITY_STYLE[p.priority]}/>
-                              <Badge label={p.status} style={STATUS_STYLE[p.status]}/>
-                              <span style={{fontSize:11,color:"#9ca3af"}}>{p.deadline}</span>
-                            </div>
-                          </div>
-                          <div style={{marginTop:6}}>
-                            <div style={{background:"#d1fae5",borderRadius:4,height:6}}><div style={{height:6,borderRadius:4,background:p.progress===100?GREEN_MID:p.progress>=50?"#2563eb":"#f59e0b",width:`${p.progress}%`}}/></div>
-                            <p style={{textAlign:"right",fontSize:11,color:GREEN_MID,margin:"2px 0 0"}}>{p.progress}% completado</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })}
-                <div style={{borderTop:"1px solid #c6dfc9",paddingTop:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <div style={{display:"flex",alignItems:"center",gap:8}}><Logo size={20}/><span style={{fontSize:11,color:"#9ca3af"}}>Dashboard IT · Parque Tempisque</span></div>
-                  <button onClick={printReport} style={{background:GREEN,color:"white",border:"none",borderRadius:8,padding:"6px 14px",fontSize:12,fontWeight:700,cursor:"pointer"}}>📤 Exportar PDF</button>
-                </div>
-              </div>
-            )}
+              );
+            })}
+            <div style={{borderTop:`1px solid #c6dfc9`,paddingTop:12,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div style={{display:"flex",alignItems:"center",gap:8}}><Logo size={20}/><span style={{fontSize:11,color:"#9ca3af"}}>Generado automáticamente · Dashboard IT · Parque Tempisque</span></div>
+              <button onClick={printReport} style={{background:GREEN,color:"white",border:"none",borderRadius:8,padding:"7px 16px",fontSize:12,fontWeight:700,cursor:"pointer"}}>📤 Exportar PDF</button>
+            </div>
           </div>
-        </div>
-      );
-    }
+        )}
+      </div>
+    </div>
+  );
+}
 
-    ReactDOM.render(<App/>, document.getElementById("root"));
-  </script>
+ReactDOM.render(<App/>, document.getElementById("root"));
+</script>
 </body>
 </html>
