@@ -464,7 +464,7 @@ function ProjectsList({itProjects, projects, onSelect, onNew, onEdit, onDelete})
 }
 
 // ── Dashboard individual de un proyecto ────────────────────────
-function ProjectDashboard({itProject, projects, onBack, onEdit, setDetailProject, cycleStatus}) {
+function ProjectDashboard({itProject, projects, onBack, onEdit, setDetailProject, cycleStatus, onNewTask}) {
   const tasks = projects.filter(t => t.project_id === itProject.id);
   const taskStats = {
     total: tasks.length,
@@ -547,10 +547,12 @@ function ProjectDashboard({itProject, projects, onBack, onEdit, setDetailProject
       <div style={{background:"white",borderRadius:12,border:`1px solid #c6dfc9`,overflow:"hidden"}}>
         <div style={{background:GREEN,color:"white",padding:"10px 18px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <h3 style={{margin:0,fontSize:13,fontWeight:700}}>📋 Tareas del proyecto ({tasks.length})</h3>
+          <button onClick={onNewTask} style={{background:"rgba(255,255,255,0.2)",color:"white",border:"1px solid rgba(255,255,255,0.3)",borderRadius:6,padding:"5px 12px",fontSize:12,fontWeight:700,cursor:"pointer"}}>+ Nueva tarea</button>
         </div>
         {tasks.length===0 ? (
           <div style={{padding:32,textAlign:"center",color:"#9ca3af",fontSize:13}}>
-            No hay tareas asignadas. Crea una tarea y asígnala a este proyecto.
+            <p style={{margin:"0 0 12px"}}>No hay tareas asignadas a este proyecto todavía.</p>
+            <button onClick={onNewTask} style={{background:GREEN,color:"white",border:"none",borderRadius:8,padding:"8px 18px",fontSize:12,fontWeight:700,cursor:"pointer"}}>+ Crear primera tarea</button>
           </div>
         ) : (
           <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
@@ -1118,6 +1120,13 @@ function App(){
               onEdit={startEditITProject}
               setDetailProject={setDetailProject}
               cycleStatus={cycleStatus}
+              onNewTask={()=>{
+                setForm({...EMPTY, project_id: selectedProject.id});
+                setEditId(null);
+                setView("tabla");
+                setFilterProject(String(selectedProject.id));
+                setShowForm(true);
+              }}
             />
           ) : (
             <ProjectsList
